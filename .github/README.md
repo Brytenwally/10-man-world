@@ -1,25 +1,99 @@
-# SKELETON - Module template
+# 10 Man World
 
-[English](README.md) | [Español](README_ES.md)
-
-
-## How to create your own module
-
-1. Use the script `create_module.sh` located in [`modules/`](https://github.com/azerothcore/azerothcore-wotlk/tree/master/modules) to start quickly with all the files you need and your git repo configured correctly (heavily recommended).
-1. You can then use these scripts to start your project: https://github.com/azerothcore/azerothcore-boilerplates
-1. Do not hesitate to compare with some of our newer/bigger/famous modules.
-1. Edit the `README.md` and other files (`include.sh` etc...) to fit your module. Note: the README is automatically created from `README_example.md` when you use the script `create_module.sh`.
-1. Publish your module to our [catalogue](https://www.azerothcore.org/catalogue.html).
+An AzerothCore module built around 10-player raid groups.
 
 
-## How to test your module?
+It currently lets a raid group (up to 10 players by default) use the Dungeon Finder together, with no role check
+and no queue, and queue together for the Random Battleground.
 
-Disable PCH (precompiled headers) and try to compile. To disable PCH, set `-DNOPCH=1` with Cmake (more info [here](http://www.azerothcore.org/wiki/CMake-options)).
+## Dungeon Finder
 
-If you forgot some headers, it is time to add them!
+When the leader of a **raid group** opens the Dungeon Finder, picks a random dungeon (or one or more specific
+dungeons) and clicks **Join as Party**:
 
-## Licensing
+1. Every member is checked the way the Dungeon Finder normally checks a party: online, not in a battleground,
+   no Deserter debuff, no Dungeon Finder cooldown for random dungeons, and the level/gear/attunement locks of the
+   chosen dungeons.
+2. There is **no role check** and **no queue**. The leader keeps the roles they ticked; everyone else keeps the
+   role they last used in the Dungeon Finder, or damage if they never picked one.
+3. A dungeon is chosen from those every member can enter (the same selection a normal random dungeon uses,
+   including the "recently completed" filter), the raid becomes a Dungeon Finder group and every member is
+   teleported in straight away.
 
-The default license of the skeleton-module template is the MIT but you can use a different license for your own modules.
+From there it behaves like any Dungeon Finder group: random dungeon rewards on the final boss, the Dungeon Finder
+cooldown, the "Luck of the Draw" buff, the teleport in/out button and vote kicks.
 
-So modules can also be kept private. However, if you need to add new hooks to the core, as well as improving existing ones, you have to share your improvements because the main core is released under the AGPL license. Please [provide a PR](https://www.azerothcore.org/wiki/How-to-create-a-PR) if that is the case.
+Parties of five or fewer and raid (Raid Browser) selections are left to the normal Dungeon Finder.
+
+Five-player dungeons normally hold five players. The module raises that limit to `MaxMembers` only for players in
+a Dungeon Finder raid; every other group still meets the dungeon's own cap.
+
+## Random Battleground
+
+A raid group of up to `TenManWorld.Battleground.MaxMembers` players (10 by default) can queue together for the
+Random Battleground, which otherwise refuses groups bigger than five. Only the size limit changes; the normal
+group checks still apply (online, same level bracket and faction, no Deserter, not queued for anything else, not a
+Dungeon Finder group), and the raid enters the regular queue. The limit never goes above the Random Battleground
+team size (`battleground_template`, 10 players), so a full raid makes up one whole side.
+
+The 3.3.5 client may not offer **Join as Group** to a raid. With `LeaderQueuesRaid` on (the default), the raid
+leader's plain **Join Battle** click for Random Battleground queues the whole raid. Specific battlegrounds are
+unchanged.
+
+## Configuration
+
+Copy `conf/10-man-world.conf.dist` to `10-man-world.conf` in the server's module config directory.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `TenManWorld.DungeonFinder.Enable` | `1` | `0` turns instant raid queueing off; raids then get the usual "too many members" error. Reloadable. |
+| `TenManWorld.DungeonFinder.MaxMembers` | `10` | Largest raid allowed to queue, and the dungeon player cap for Dungeon Finder raids (5-40). Reloadable. |
+| `TenManWorld.Battleground.Enable` | `1` | `0` keeps the normal group size limit for Random Battleground. Reloadable. |
+| `TenManWorld.Battleground.MaxMembers` | `10` | Largest raid allowed to queue for Random Battleground (5-40, never above its team size). Reloadable. |
+| `TenManWorld.Battleground.LeaderQueuesRaid` | `1` | The raid leader's plain "Join Battle" for Random Battleground queues the whole raid. Reloadable. |
+
+## Installing
+
+The module needs a few small core changes, shipped as `patches/10-man-world-core.patch`. Apply the patch to the
+core **before** configuring and compiling; without it the module does not compile.
+
+The folder must be called exactly `10-man-world` (the default clone name): AzerothCore looks for a loader named
+after the module folder, and this module's loader is `Add10_man_worldScripts()`.
+
+```sh
+cd <azerothcore>/modules
+git clone https://github.com/Brytenwally/10-man-world.git
+./10-man-world/patches/apply.sh            # or: ./10-man-world/patches/apply.sh /path/to/azerothcore
+# then re-run CMake and build as usual
+```
+
+On Windows, run `apply.sh` from Git Bash, or apply the patch from the core folder with
+`git apply modules/10-man-world/patches/10-man-world-core.patch`. `apply.sh` does nothing if the patch is already
+applied.
+
+The patch is made against [Brytenwally/azerothcore-wotlk-coa](https://github.com/Brytenwally/azerothcore-wotlk-coa);
+other AzerothCore forks may need it adjusted.
+
+The patch:
+
+- makes `GetDungeonsByRandom`, `GetDungeonType`, `GetCompatibleDungeons`, `SetSelectedDungeons`, `SetState` and
+  `MakeNewGroup` public in `lfg::LFGMgr`, so the module can drive the normal Dungeon Finder group creation;
+- adds `PlayerScript::OnPlayerInstancePlayerLimit`, called from `InstanceMap::CannotEnter`, so a script can change
+  an instance's player cap for the player entering it;
+- adds `GroupScript::OnBattlegroundMaxGroupSize`, called from `Group::CanJoinBattlegroundQueue`, so a script can
+  raise the largest group allowed to queue for a battleground;
+- adds `PlayerScript::OnPlayerBattlegroundJoinAsGroup`, called from `WorldSession::HandleBattlemasterJoinOpcode`,
+  so a script can decide whether the player's group joins the queue with them.
+
+## License
+
+The module is released under the MIT License (see `LICENSE`). `patches/10-man-world-core.patch` modifies
+AzerothCore itself and stays under the core's license, the GNU GPL v2 (or later).
+
+## Known limitations
+
+- Dungeon quests do not give credit in a raid group (normal WotLK behaviour), only the random dungeon reward does.
+- Encounters are tuned for five players, so ten players will find dungeons easier.
+- A 10-player raid fills one whole Random Battleground side, so it only gets into a new battleground, never into
+  one already running with a few free slots; its queue can be longer than a party's.
+- With `LeaderQueuesRaid` on, a raid leader cannot queue alone for Random Battleground while in the raid.

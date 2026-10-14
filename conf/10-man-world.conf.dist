@@ -1,0 +1,51 @@
+[worldserver]
+
+################################################################################################################
+#    10 Man World - Dungeon Finder
+#        Description: lets the leader of a raid group use the Dungeon Finder (random or specific
+#                     dungeons) with the whole raid. There is no role check and no queue: the
+#                     moment the leader clicks "Join as party" the raid becomes a Dungeon Finder
+#                     group and every member is teleported into the selected dungeon.
+#                     Parties of up to five and raid (LFR) selections keep the normal behaviour.
+#
+#        TenManWorld.DungeonFinder.Enable: 1 (Default) enables instant raid queueing
+#                               0 = raid groups get the normal "too many members" refusal
+#                               Read at startup and on ".reload config".
+#
+#        TenManWorld.DungeonFinder.MaxMembers: the largest raid allowed to queue. Default 10.
+#                                   Five-player dungeons accept this many players from a Dungeon
+#                                   Finder raid; every other group keeps the dungeon's own cap.
+#                                   Clamped to 5-40. Read at startup and on ".reload config".
+#
+
+TenManWorld.DungeonFinder.Enable = 1
+
+TenManWorld.DungeonFinder.MaxMembers = 10
+
+################################################################################################################
+#    10 Man World - Random Battleground
+#        Description: lets a raid group queue together for the Random Battleground. Every member
+#                     still has to pass the normal group checks (same level bracket and faction,
+#                     no Deserter, not queued elsewhere, not in a Dungeon Finder group).
+#
+#        TenManWorld.Battleground.Enable: 1 (Default) lets raid groups queue for Random Battleground
+#                                            0 = raids keep the normal group size limit
+#
+#        TenManWorld.Battleground.MaxMembers: the largest raid allowed to queue. Default 10.
+#                                                Never more than the Random Battleground team size
+#                                                (battleground_template, 10 by default). Clamped to 5-40.
+#
+#        TenManWorld.Battleground.LeaderQueuesRaid: 1 (Default) when a raid leader clicks the plain
+#                                                      "Join Battle" button for Random Battleground,
+#                                                      the whole raid is queued (the 3.3.5 client may
+#                                                      not offer "Join as Group" to a raid)
+#                                                      0 = only "Join as Group" queues the raid
+#
+#        All three are read at startup and on ".reload config".
+#
+
+TenManWorld.Battleground.Enable = 1
+
+TenManWorld.Battleground.MaxMembers = 10
+
+TenManWorld.Battleground.LeaderQueuesRaid = 1
