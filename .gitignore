@@ -46,3 +46,8 @@ local.properties
 .loadpath
 .project
 .cproject
+
+#
+# Core patch shipped with the module
+#
+!patches/*.patch
