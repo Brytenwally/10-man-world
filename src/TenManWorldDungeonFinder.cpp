@@ -72,7 +72,9 @@ namespace
         if (!member->GetSession()->HasPermission(rbac::RBAC_PERM_JOIN_DUNGEON_FINDER))
             return isLeader ? LFG_JOIN_NOT_MEET_REQS : LFG_JOIN_PARTY_NOT_MEET_REQS;
 
-        if (member->InBattleground() || (member->InBattlegroundQueue() && !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG)))
+        bool const queuedForBattleground = member->InBattlegroundQueue()
+            && !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG);
+        if (member->InBattleground() || queuedForBattleground)
             return LFG_JOIN_USING_BG_SYSTEM;
 
         if (member->HasAura(LFG_SPELL_DUNGEON_DESERTER))
@@ -93,7 +95,8 @@ namespace
         session->SendLfgUpdateParty(LfgUpdateData(LFG_UPDATETYPE_REMOVED_FROM_QUEUE));
     }
 
-    LfgJoinResultData LaunchInstantDungeon(Player* leader, Group* group, uint8 leaderRoles, LfgDungeonSet const& dungeons, std::string const& comment)
+    LfgJoinResultData LaunchInstantDungeon(Player* leader, Group* group, uint8 leaderRoles,
+        LfgDungeonSet const& dungeons, std::string const& comment)
     {
         LfgJoinResultData joinData;
         ObjectGuid const gguid = group->GetGUID();
@@ -209,9 +212,12 @@ namespace
 class TenManWorldDungeonFinderPlayerScript : public PlayerScript
 {
 public:
-    TenManWorldDungeonFinderPlayerScript() : PlayerScript("TenManWorldDungeonFinderPlayerScript", { PLAYERHOOK_CAN_JOIN_LFG, PLAYERHOOK_ON_INSTANCE_PLAYER_LIMIT }) { }
+    TenManWorldDungeonFinderPlayerScript()
+        : PlayerScript("TenManWorldDungeonFinderPlayerScript",
+            { PLAYERHOOK_CAN_JOIN_LFG, PLAYERHOOK_ON_INSTANCE_PLAYER_LIMIT }) { }
 
-    bool OnPlayerCanJoinLfg(Player* player, uint8 roles, std::set<uint32>& dungeons, std::string const& comment) override
+    bool OnPlayerCanJoinLfg(Player* player, uint8 roles, std::set<uint32>& dungeons,
+        std::string const& comment) override
     {
         if (!g_enabled)
             return true;
@@ -247,12 +253,14 @@ public:
 class TenManWorldDungeonFinderWorldScript : public WorldScript
 {
 public:
-    TenManWorldDungeonFinderWorldScript() : WorldScript("TenManWorldDungeonFinderWorldScript", { WORLDHOOK_ON_AFTER_CONFIG_LOAD }) { }
+    TenManWorldDungeonFinderWorldScript()
+        : WorldScript("TenManWorldDungeonFinderWorldScript", { WORLDHOOK_ON_AFTER_CONFIG_LOAD }) { }
 
     void OnAfterConfigLoad(bool /*reload*/) override
     {
         g_enabled = sConfigMgr->GetOption<bool>(ENABLE_CONFIG_KEY, true);
-        g_maxMembers = std::clamp<uint32>(sConfigMgr->GetOption<uint32>(MAX_MEMBERS_CONFIG_KEY, DEFAULT_MAX_MEMBERS), MAXGROUPSIZE, MAXRAIDSIZE);
+        uint32 const maxMembers = sConfigMgr->GetOption<uint32>(MAX_MEMBERS_CONFIG_KEY, DEFAULT_MAX_MEMBERS);
+        g_maxMembers = std::clamp<uint32>(maxMembers, MAXGROUPSIZE, MAXRAIDSIZE);
     }
 };
 

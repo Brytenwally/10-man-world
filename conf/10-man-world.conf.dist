@@ -49,3 +49,45 @@ TenManWorld.Battleground.Enable = 1
 TenManWorld.Battleground.MaxMembers = 10
 
 TenManWorld.Battleground.LeaderQueuesRaid = 1
+
+################################################################################################################
+#    10 Man World - Creature modifiers
+#        Description: multiplies creature health and damage by where the creature lives and by its rank.
+#                     "Elite" covers elites, rares, rare elites and bosses (any creature_template rank but
+#                     normal; in dungeons also every dungeon boss). Raids, battlegrounds, arenas and scripted
+#                     private instances are not changed. Player pets, totems, triggers, critters and training
+#                     dummies are never changed.
+#
+#                     Health: applied when a creature spawns, respawns or changes entry. A reload changes
+#                     creatures spawned after it; already spawned ones keep their health until they respawn.
+#                     Damage: applied to the damage a creature deals to players and their pets (melee, spells
+#                     and damage over time); takes effect immediately on reload.
+#
+#                     The multipliers stack (multiply) with the fork's other scalers, such as
+#                     CoA.CreatureScaling, CoA.DungeonTuning and Mythic+.
+#
+#        TenManWorld.CreatureModifiers.Enable: 1 (Default) applies the multipliers below
+#                                              0 = creatures keep their normal health and damage
+#
+#        TenManWorld.CreatureModifiers.<Area>.<Rank>.Health / .Damage: multiplier, 1.0 = unchanged.
+#            World.Normal    open world normal creatures        default 4.0 health, 3.0 damage
+#            World.Elite     open world rares, elites, bosses   default 2.5 health, 2.0 damage
+#            Dungeon.Normal  five-player dungeon non-elites     default 2.5 health, 2.0 damage
+#            Dungeon.Elite   five-player dungeon elites/bosses  default 2.0 health, 1.5 damage
+#
+#        All values are read at startup and on ".reload config".
+#
+
+TenManWorld.CreatureModifiers.Enable = 1
+
+TenManWorld.CreatureModifiers.World.Normal.Health = 4.0
+TenManWorld.CreatureModifiers.World.Normal.Damage = 3.0
+
+TenManWorld.CreatureModifiers.World.Elite.Health = 2.5
+TenManWorld.CreatureModifiers.World.Elite.Damage = 2.0
+
+TenManWorld.CreatureModifiers.Dungeon.Normal.Health = 2.5
+TenManWorld.CreatureModifiers.Dungeon.Normal.Damage = 2.0
+
+TenManWorld.CreatureModifiers.Dungeon.Elite.Health = 2.0
+TenManWorld.CreatureModifiers.Dungeon.Elite.Damage = 1.5

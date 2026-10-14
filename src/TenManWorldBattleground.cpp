@@ -41,7 +41,8 @@ namespace
 class TenManWorldBattlegroundPlayerScript : public PlayerScript
 {
 public:
-    TenManWorldBattlegroundPlayerScript() : PlayerScript("TenManWorldBattlegroundPlayerScript", { PLAYERHOOK_ON_BATTLEGROUND_JOIN_AS_GROUP }) { }
+    TenManWorldBattlegroundPlayerScript()
+        : PlayerScript("TenManWorldBattlegroundPlayerScript", { PLAYERHOOK_ON_BATTLEGROUND_JOIN_AS_GROUP }) { }
 
     void OnPlayerBattlegroundJoinAsGroup(Player* player, BattlegroundTypeId bgTypeId, uint8& joinAsGroup) override
     {
@@ -57,7 +58,8 @@ public:
 class TenManWorldBattlegroundGroupScript : public GroupScript
 {
 public:
-    TenManWorldBattlegroundGroupScript() : GroupScript("TenManWorldBattlegroundGroupScript", { GROUPHOOK_ON_BATTLEGROUND_MAX_GROUP_SIZE }) { }
+    TenManWorldBattlegroundGroupScript()
+        : GroupScript("TenManWorldBattlegroundGroupScript", { GROUPHOOK_ON_BATTLEGROUND_MAX_GROUP_SIZE }) { }
 
     void OnBattlegroundMaxGroupSize(Group const* group, Battleground const* bgTemplate, uint32& maxGroupSize) override
     {
@@ -72,12 +74,14 @@ public:
 class TenManWorldBattlegroundWorldScript : public WorldScript
 {
 public:
-    TenManWorldBattlegroundWorldScript() : WorldScript("TenManWorldBattlegroundWorldScript", { WORLDHOOK_ON_AFTER_CONFIG_LOAD }) { }
+    TenManWorldBattlegroundWorldScript()
+        : WorldScript("TenManWorldBattlegroundWorldScript", { WORLDHOOK_ON_AFTER_CONFIG_LOAD }) { }
 
     void OnAfterConfigLoad(bool /*reload*/) override
     {
         g_enabled = sConfigMgr->GetOption<bool>(ENABLE_CONFIG_KEY, true);
-        g_maxMembers = std::clamp<uint32>(sConfigMgr->GetOption<uint32>(MAX_MEMBERS_CONFIG_KEY, DEFAULT_MAX_MEMBERS), MAXGROUPSIZE, MAXRAIDSIZE);
+        uint32 const maxMembers = sConfigMgr->GetOption<uint32>(MAX_MEMBERS_CONFIG_KEY, DEFAULT_MAX_MEMBERS);
+        g_maxMembers = std::clamp<uint32>(maxMembers, MAXGROUPSIZE, MAXRAIDSIZE);
         g_leaderQueuesRaid = sConfigMgr->GetOption<bool>(LEADER_QUEUES_RAID_CONFIG_KEY, true);
     }
 };

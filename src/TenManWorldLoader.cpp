@@ -4,10 +4,12 @@
 
 void AddSC_ten_man_world_dungeon_finder();
 void AddSC_ten_man_world_battleground();
+void AddSC_ten_man_world_creature_modifiers();
 
 // The module folder must be named 10-man-world: AzerothCore calls Add<folder name, '-' -> '_'>Scripts()
 void Add10_man_worldScripts()
 {
     AddSC_ten_man_world_dungeon_finder();
     AddSC_ten_man_world_battleground();
+    AddSC_ten_man_world_creature_modifiers();
 }

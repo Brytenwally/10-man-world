@@ -4,7 +4,8 @@ An AzerothCore module built around 10-player raid groups.
 
 
 It currently lets a raid group (up to 10 players by default) use the Dungeon Finder together, with no role check
-and no queue, and queue together for the Random Battleground.
+and no queue, and queue together for the Random Battleground, and it makes creatures tougher to suit a group of
+ten.
 
 ## Dungeon Finder
 
@@ -40,6 +41,26 @@ The 3.3.5 client may not offer **Join as Group** to a raid. With `LeaderQueuesRa
 leader's plain **Join Battle** click for Random Battleground queues the whole raid. Specific battlegrounds are
 unchanged.
 
+## Creature modifiers
+
+Creature health and damage are multiplied by where the creature lives and by its rank:
+
+| Creatures | Health | Damage |
+| --- | --- | --- |
+| Open world normal | 4x | 3x |
+| Open world rares, elites and bosses | 2.5x | 2x |
+| Dungeon non-elites | 2.5x | 2x |
+| Dungeon elites and bosses | 2x | 1.5x |
+
+"Dungeon" means five-player dungeons, normal and heroic. Raids, battlegrounds, arenas and the fork's scripted private
+instances are not changed. Player pets, totems, triggers, critters and training dummies are never changed; creatures
+summoned by other creatures (boss adds) are.
+
+- **Health** is set when a creature spawns, respawns or changes entry, keeping its current health percentage.
+- **Damage** is multiplied for everything a creature deals to players and their pets: melee, spells and damage over
+  time. Damage between creatures (for example a mob hitting an escort NPC) is unchanged.
+- The multipliers stack with this fork's other scalers (`CoA.CreatureScaling`, `CoA.DungeonTuning`, Mythic+).
+
 ## Configuration
 
 Copy `conf/10-man-world.conf.dist` to `10-man-world.conf` in the server's module config directory.
@@ -51,6 +72,8 @@ Copy `conf/10-man-world.conf.dist` to `10-man-world.conf` in the server's module
 | `TenManWorld.Battleground.Enable` | `1` | `0` keeps the normal group size limit for Random Battleground. Reloadable. |
 | `TenManWorld.Battleground.MaxMembers` | `10` | Largest raid allowed to queue for Random Battleground (5-40, never above its team size). Reloadable. |
 | `TenManWorld.Battleground.LeaderQueuesRaid` | `1` | The raid leader's plain "Join Battle" for Random Battleground queues the whole raid. Reloadable. |
+| `TenManWorld.CreatureModifiers.Enable` | `1` | `0` leaves creature health and damage unchanged. Reloadable. |
+| `TenManWorld.CreatureModifiers.<Area>.<Rank>.Health` / `.Damage` | see table above | `World.Normal`, `World.Elite`, `Dungeon.Normal`, `Dungeon.Elite`; `1.0` = unchanged. Reloadable (health applies to creatures spawned afterwards). |
 
 ## Installing
 
@@ -74,7 +97,7 @@ applied.
 The patch is made against [Brytenwally/azerothcore-wotlk-coa](https://github.com/Brytenwally/azerothcore-wotlk-coa);
 other AzerothCore forks may need it adjusted.
 
-The patch:
+The patch (the creature modifiers need no core change; they use existing hooks):
 
 - makes `GetDungeonsByRandom`, `GetDungeonType`, `GetCompatibleDungeons`, `SetSelectedDungeons`, `SetState` and
   `MakeNewGroup` public in `lfg::LFGMgr`, so the module can drive the normal Dungeon Finder group creation;
