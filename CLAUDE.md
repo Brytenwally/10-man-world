@@ -1,7 +1,7 @@
 # CLAUDE.md
 
-10 Man World is an AzerothCore module for the `coa-bots` branch of
-[Brytenwally/azerothcore-wotlk-coa](https://github.com/Brytenwally/azerothcore-wotlk-coa) (CoA with playerbots).
+10 Man World is an AzerothCore module for
+[Brytenwally/azerothcore-wotlk-coa](https://github.com/Brytenwally/azerothcore-wotlk-coa).
 User documentation is in `.github/README.md`.
 
 ## Git workflow
@@ -19,7 +19,7 @@ User documentation is in `.github/README.md`.
 - `patches/mod-10-man-world-core.patch` and `patches/apply.sh`: core changes the module needs. They are applied to
   the core before building. Make core changes here, never as direct commits to the core repository. Regenerate the
   patch with `git diff` from a core checkout that has the change applied, check that it applies cleanly to the core's
-  `coa-bots`, and then revert the core checkout.
+  `main`, and then revert the core checkout.
 
 ## Building and checking
 

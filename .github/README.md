@@ -59,7 +59,7 @@ summoned by other creatures (boss adds) are.
 - **Health** is set when a creature spawns, respawns or changes entry, keeping its current health percentage.
 - **Damage** is multiplied for everything a creature deals to players and their pets: melee, spells and damage over
   time. Damage between creatures (for example a mob hitting an escort NPC) is unchanged.
-- The multipliers stack (multiply) with any other module that scales creature health or damage the same way.
+- The multipliers stack with this fork's other scalers (`CoA.CreatureScaling`, `CoA.DungeonTuning`, Mythic+).
 
 ## Configuration
 
@@ -94,9 +94,8 @@ On Windows, run `apply.sh` from Git Bash, or apply the patch from the core folde
 `git apply modules/mod-10-man-world/patches/mod-10-man-world-core.patch`. `apply.sh` does nothing if the patch is
 already applied.
 
-The patch is made against the `coa-bots` branch of
-[Brytenwally/azerothcore-wotlk-coa](https://github.com/Brytenwally/azerothcore-wotlk-coa) (CoA with playerbots);
-other AzerothCore forks or branches may need it adjusted.
+The patch is made against [Brytenwally/azerothcore-wotlk-coa](https://github.com/Brytenwally/azerothcore-wotlk-coa);
+other AzerothCore forks may need it adjusted.
 
 The patch (the creature modifiers need no core change; they use existing hooks):
 
