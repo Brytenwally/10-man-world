@@ -63,7 +63,7 @@ summoned by other creatures (boss adds) are.
 
 ## Configuration
 
-Copy `conf/10-man-world.conf.dist` to `10-man-world.conf` in the server's module config directory.
+Copy `conf/mod-10-man-world.conf.dist` to `mod-10-man-world.conf` in the server's module config directory.
 
 | Option | Default | Description |
 | --- | --- | --- |
@@ -77,22 +77,22 @@ Copy `conf/10-man-world.conf.dist` to `10-man-world.conf` in the server's module
 
 ## Installing
 
-The module needs a few small core changes, shipped as `patches/10-man-world-core.patch`. Apply the patch to the
+The module needs a few small core changes, shipped as `patches/mod-10-man-world-core.patch`. Apply the patch to the
 core **before** configuring and compiling; without it the module does not compile.
 
-The folder must be called exactly `10-man-world` (the default clone name): AzerothCore looks for a loader named
-after the module folder, and this module's loader is `Add10_man_worldScripts()`.
+The folder must be called exactly `mod-10-man-world` (the default clone name): AzerothCore looks for a loader named
+after the module folder, and this module's loader is `Addmod_10_man_worldScripts()`.
 
 ```sh
 cd <azerothcore>/modules
-git clone https://github.com/Brytenwally/10-man-world.git
-./10-man-world/patches/apply.sh            # or: ./10-man-world/patches/apply.sh /path/to/azerothcore
+git clone https://github.com/Brytenwally/mod-10-man-world.git
+./mod-10-man-world/patches/apply.sh            # or: ./mod-10-man-world/patches/apply.sh /path/to/azerothcore
 # then re-run CMake and build as usual
 ```
 
 On Windows, run `apply.sh` from Git Bash, or apply the patch from the core folder with
-`git apply modules/10-man-world/patches/10-man-world-core.patch`. `apply.sh` does nothing if the patch is already
-applied.
+`git apply modules/mod-10-man-world/patches/mod-10-man-world-core.patch`. `apply.sh` does nothing if the patch is
+already applied.
 
 The patch is made against [Brytenwally/azerothcore-wotlk-coa](https://github.com/Brytenwally/azerothcore-wotlk-coa);
 other AzerothCore forks may need it adjusted.
@@ -110,7 +110,7 @@ The patch (the creature modifiers need no core change; they use existing hooks):
 
 ## License
 
-The module is released under the MIT License (see `LICENSE`). `patches/10-man-world-core.patch` modifies
+The module is released under the MIT License (see `LICENSE`). `patches/mod-10-man-world-core.patch` modifies
 AzerothCore itself and stays under the core's license, the GNU GPL v2 (or later).
 
 ## Known limitations

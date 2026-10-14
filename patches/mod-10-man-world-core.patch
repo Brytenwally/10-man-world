@@ -6,7 +6,7 @@ index 78a23609..f25bd080 100644
          LFGDungeonData const* GetLFGDungeon(uint32 id);
          LFGDungeonData const* GetClassicRandomFallback(uint32 completedDungeonId);
  
-+        // Group formation without queueing (10-man-world)
++        // Group formation without queueing (mod-10-man-world)
 +        void SetSelectedDungeons(ObjectGuid guid, LfgDungeonSet const& dungeons);
 +        void SetState(ObjectGuid guid, LfgState state);
 +        void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, uint32 randomDungeonId = 0);
