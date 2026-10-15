@@ -11,6 +11,7 @@
  */
 
 #include "Battleground.h"
+#include "BattlegroundMgr.h"
 #include "Config.h"
 #include "Group.h"
 #include "GroupScript.h"
@@ -20,6 +21,7 @@
 #include "WorldScript.h"
 
 #include <algorithm>
+#include <atomic>
 
 namespace
 {
@@ -28,13 +30,20 @@ namespace
     constexpr char LEADER_QUEUES_RAID_CONFIG_KEY[] = "TenManWorld.Battleground.LeaderQueuesRaid";
     constexpr uint32 DEFAULT_MAX_MEMBERS = 10;
 
-    bool g_enabled = true;
-    uint32 g_maxMembers = DEFAULT_MAX_MEMBERS;
-    bool g_leaderQueuesRaid = true;
+    std::atomic<bool> g_enabled = true;
+    std::atomic<uint32> g_maxMembers = DEFAULT_MAX_MEMBERS;
+    std::atomic<bool> g_leaderQueuesRaid = true;
 
     bool IsQueueableRaid(Group const* group)
     {
         return group && group->isRaidGroup() && !group->isBGGroup() && !group->isBFGroup() && !group->isLFGGroup();
+    }
+
+    uint32 RaidLimit(Battleground const* bgTemplate)
+    {
+        uint32 const maxMembers = g_maxMembers.load();
+        uint32 const teamSize = bgTemplate ? bgTemplate->GetMaxPlayersPerTeam() : 0;
+        return teamSize ? std::min(maxMembers, teamSize) : maxMembers;
     }
 }
 
@@ -50,7 +59,10 @@ public:
             return;
 
         Group const* group = player->GetGroup();
-        if (IsQueueableRaid(group) && group->GetLeaderGUID() == player->GetGUID())
+        if (!IsQueueableRaid(group) || group->GetLeaderGUID() != player->GetGUID())
+            return;
+
+        if (group->GetMembersCount() <= RaidLimit(sBattlegroundMgr->GetBattlegroundTemplate(BATTLEGROUND_RB)))
             joinAsGroup = 1;
     }
 };
@@ -66,8 +78,7 @@ public:
         if (!g_enabled || bgTemplate->GetBgTypeID() != BATTLEGROUND_RB || !IsQueueableRaid(group))
             return;
 
-        uint32 const teamSize = bgTemplate->GetMaxPlayersPerTeam();
-        maxGroupSize = std::max(maxGroupSize, teamSize ? std::min(g_maxMembers, teamSize) : g_maxMembers);
+        maxGroupSize = std::max(maxGroupSize, RaidLimit(bgTemplate));
     }
 };
 

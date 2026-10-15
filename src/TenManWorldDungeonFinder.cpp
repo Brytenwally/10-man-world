@@ -25,6 +25,7 @@
 #include "WorldSession.h"
 
 #include <algorithm>
+#include <atomic>
 #include <set>
 #include <string>
 #include <vector>
@@ -37,8 +38,8 @@ namespace
     constexpr char MAX_MEMBERS_CONFIG_KEY[] = "TenManWorld.DungeonFinder.MaxMembers";
     constexpr uint32 DEFAULT_MAX_MEMBERS = 10;
 
-    bool g_enabled = true;
-    uint32 g_maxMembers = DEFAULT_MAX_MEMBERS;
+    std::atomic<bool> g_enabled = true;
+    std::atomic<uint32> g_maxMembers = DEFAULT_MAX_MEMBERS;
 
     bool IsDungeonSelection(LfgDungeonSet const& dungeons)
     {
@@ -246,7 +247,7 @@ public:
 
         Group* group = player->GetGroup();
         if (group && group->isLFGGroup() && group->isRaidGroup())
-            maxPlayers = std::max(maxPlayers, g_maxMembers);
+            maxPlayers = std::max(maxPlayers, g_maxMembers.load());
     }
 };
 

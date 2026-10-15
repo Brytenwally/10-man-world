@@ -7,7 +7,8 @@
  *
  * Multiplies the health and damage of creatures by where they live (open world or five-player dungeon) and by
  * their rank (normal, or rare/elite/boss). Health is applied whenever a creature's level is selected (spawn,
- * respawn, entry change); damage is applied to the damage a creature deals to players and their pets.
+ * respawn, entry change); damage is applied to the damage a hostile creature deals to players and their pets,
+ * never to its heals.
  * Raids, battlegrounds, arenas and scripted private instances are left alone.
  */
 
@@ -108,8 +109,12 @@ namespace
         if (!target || !attacker || !target->GetCharmerOrOwnerPlayerOrPlayerItself())
             return 1.0f;
 
-        Category const category = CategoryOf(attacker->ToCreature());
-        return category == Category::None ? 1.0f : g_damage[size_t(category)].load(std::memory_order_relaxed);
+        Creature const* creature = attacker->ToCreature();
+        Category const category = CategoryOf(creature);
+        if (category == Category::None || !creature->IsHostileTo(target))
+            return 1.0f;
+
+        return g_damage[size_t(category)].load(std::memory_order_relaxed);
     }
 
     template <typename T>
@@ -192,8 +197,11 @@ public:
     }
 
     void ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage,
-        SpellInfo const* /*spellInfo*/) override
+        SpellInfo const* spellInfo) override
     {
+        if (spellInfo && spellInfo->IsPositive())
+            return;
+
         ScaleDamage(damage, target, attacker);
     }
 };
