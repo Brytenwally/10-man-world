@@ -1,11 +1,14 @@
 # 10 Man World
 
-An AzerothCore module built around 10-player raid groups.
+A comprehensive AzerothCore module for a full 10-player World of Warcraft experience: a group of ten levels,
+quests, runs dungeons and plays battlegrounds together, as one raid.
 
-
-It currently lets a raid group (up to 10 players by default) use the Dungeon Finder together, with no role check
-and no queue, and queue together for the Random Battleground, and it makes creatures tougher to suit a group of
-ten.
+- **Dungeon Finder:** a raid of up to 10 players joins a dungeon instantly, with no role check and no queue.
+- **Random Battleground:** a raid of up to 10 players queues together.
+- **Creature modifiers:** open-world and dungeon creatures get more health and damage, so a group of ten finds mobs
+  proportionally as difficult as a solo player or a five-player group did before.
+- **Questing as a raid:** with one `worldserver.conf` setting (see [Questing in a raid](#questing-in-a-raid)),
+  ordinary quests count for the whole raid.
 
 ## Dungeon Finder
 
@@ -56,10 +59,27 @@ Creature health and damage are multiplied by where the creature lives and by its
 instances are not changed. Player pets, totems, triggers, critters and training dummies are never changed; creatures
 summoned by other creatures (boss adds) are.
 
+The defaults are chosen so that mobs are now proportionally as difficult as before: ten players face roughly the
+challenge one player (open world) or five players (dungeons) faced without the module.
+
 - **Health** is set when a creature spawns, respawns or changes entry, keeping its current health percentage.
-- **Damage** is multiplied for everything a creature deals to players and their pets: melee, spells and damage over
-  time. Damage between creatures (for example a mob hitting an escort NPC) is unchanged.
+- **Damage** is multiplied for everything a hostile creature deals to players and their pets: melee, spells and
+  damage over time. Heals are never multiplied, and damage between creatures (for example a mob hitting an escort
+  NPC) is unchanged.
 - The multipliers stack with this fork's other scalers (`CoA.CreatureScaling`, `CoA.DungeonTuning`, Mythic+).
+
+## Questing in a raid
+
+By default WotLK does not let ordinary (non-raid) quests progress while you are in a raid group: kills, loot and
+objectives only count in a party. To let the whole 10-player raid quest together, enable this setting in the core's
+`worldserver.conf` (not in the module's config):
+
+```
+Quests.IgnoreRaid = 1
+```
+
+`Quests.IgnoreRaid` is in the quest section of `worldserver.conf.dist` ("Allow non-raid quests to be completed
+while in a raid group"); its default is `0`. Restart the worldserver or run `.reload config` after changing it.
 
 ## Configuration
 
@@ -115,8 +135,9 @@ AzerothCore itself and stays under the core's license, the GNU GPL v2 (or later)
 
 ## Known limitations
 
-- Dungeon quests do not give credit in a raid group (normal WotLK behaviour), only the random dungeon reward does.
-- Encounters are tuned for five players, so ten players will find dungeons easier.
+- Quests only count for a raid when `Quests.IgnoreRaid = 1` is set in `worldserver.conf` (see
+  [Questing in a raid](#questing-in-a-raid)).
 - A 10-player raid fills one whole Random Battleground side, so it only gets into a new battleground, never into
   one already running with a few free slots; its queue can be longer than a party's.
-- With `LeaderQueuesRaid` on, a raid leader cannot queue alone for Random Battleground while in the raid.
+- With `LeaderQueuesRaid` on, the leader of a raid of up to 10 cannot queue alone for Random Battleground while in
+  the raid; leaders of bigger raids queue alone as usual.
