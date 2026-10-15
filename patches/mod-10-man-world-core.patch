@@ -1,5 +1,5 @@
 diff --git a/src/server/game/DungeonFinding/LFGMgr.h b/src/server/game/DungeonFinding/LFGMgr.h
-index 78a23609..f25bd080 100644
+index 78a23609..41db97ba 100644
 --- a/src/server/game/DungeonFinding/LFGMgr.h
 +++ b/src/server/game/DungeonFinding/LFGMgr.h
 @@ -593,26 +593,28 @@ namespace lfg
@@ -78,11 +78,11 @@ index e9450de0..6358303c 100644
      {
          LOG_DEBUG("maps", "MAP: Instance '{}' of map '{}' cannot have more than '{}' players. Player '{}' rejected", GetInstanceId(), GetMapName(), maxPlayers, player->GetName());
 diff --git a/src/server/game/Scripting/ScriptDefines/GroupScript.cpp b/src/server/game/Scripting/ScriptDefines/GroupScript.cpp
-index 9d4af4f2..bd17035c 100644
+index 9d4af4f2..0864b9f6 100644
 --- a/src/server/game/Scripting/ScriptDefines/GroupScript.cpp
 +++ b/src/server/game/Scripting/ScriptDefines/GroupScript.cpp
-@@ -71,6 +71,11 @@ void ScriptMgr::OnGroupLootRollStart(Group* group, Roll const& roll, Loot const&
-     CALL_ENABLED_HOOKS(GroupScript, GROUPHOOK_ON_LOOT_ROLL_START, script->OnLootRollStart(group, roll, loot, item));
+@@ -59,6 +59,11 @@ bool ScriptMgr::CanGroupJoinBattlegroundQueue(Group const* group, Player* member
+     CALL_ENABLED_BOOLEAN_HOOKS(GroupScript, GROUPHOOK_CAN_GROUP_JOIN_BATTLEGROUND_QUEUE, !script->CanGroupJoinBattlegroundQueue(group, member, bgTemplate, MinPlayerCount, isRated, arenaSlot));
  }
  
 +void ScriptMgr::OnGroupBattlegroundMaxGroupSize(Group const* group, Battleground const* bgTemplate, uint32& maxGroupSize)
@@ -90,37 +90,37 @@ index 9d4af4f2..bd17035c 100644
 +    CALL_ENABLED_HOOKS(GroupScript, GROUPHOOK_ON_BATTLEGROUND_MAX_GROUP_SIZE, script->OnBattlegroundMaxGroupSize(group, bgTemplate, maxGroupSize));
 +}
 +
- GroupScript::GroupScript(char const* name, std::vector<uint16> enabledHooks)
-     : ScriptObject(name, GROUPHOOK_END)
+ void ScriptMgr::OnCreate(Group* group, Player* leader)
  {
+     CALL_ENABLED_HOOKS(GroupScript, GROUPHOOK_ON_CREATE, script->OnCreate(group, leader));
 diff --git a/src/server/game/Scripting/ScriptDefines/GroupScript.h b/src/server/game/Scripting/ScriptDefines/GroupScript.h
-index 955b63a0..6b3ec3c6 100644
+index 955b63a0..0353049c 100644
 --- a/src/server/game/Scripting/ScriptDefines/GroupScript.h
 +++ b/src/server/game/Scripting/ScriptDefines/GroupScript.h
-@@ -32,6 +32,7 @@ enum GroupHook
+@@ -30,6 +30,7 @@ enum GroupHook
+     GROUPHOOK_ON_CHANGE_LEADER,
+     GROUPHOOK_ON_DISBAND,
      GROUPHOOK_CAN_GROUP_JOIN_BATTLEGROUND_QUEUE,
++    GROUPHOOK_ON_BATTLEGROUND_MAX_GROUP_SIZE,
      GROUPHOOK_ON_CREATE,
      GROUPHOOK_ON_LOOT_ROLL_START,
-+    GROUPHOOK_ON_BATTLEGROUND_MAX_GROUP_SIZE,
      GROUPHOOK_END
- };
+@@ -65,6 +66,9 @@ public:
  
-@@ -69,6 +70,9 @@ public:
+     [[nodiscard]] virtual bool CanGroupJoinBattlegroundQueue(Group const* /*group*/, Player* /*member*/, Battleground const* /*bgTemplate*/, uint32 /*MinPlayerCount*/, bool /*isRated*/, uint32 /*arenaSlot*/) { return true; }
  
-     virtual void OnLootRollStart(Group* /*group*/, Roll const& /*roll*/, Loot const& /*loot*/,
-         LootItem const& /*item*/) { }
-+
 +    // Called when a group joins a battleground queue, to resolve the largest group allowed to queue together
 +    virtual void OnBattlegroundMaxGroupSize(Group const* /*group*/, Battleground const* /*bgTemplate*/, uint32& /*maxGroupSize*/) { }
- };
++
+     virtual void OnCreate(Group* /*group*/, Player* /*leader*/) { }
  
- #endif
+     virtual void OnLootRollStart(Group* /*group*/, Roll const& /*roll*/, Loot const& /*loot*/,
 diff --git a/src/server/game/Scripting/ScriptDefines/PlayerScript.cpp b/src/server/game/Scripting/ScriptDefines/PlayerScript.cpp
-index 0a54bdd6..7ce170b0 100644
+index 058365d0..befd7ae8 100644
 --- a/src/server/game/Scripting/ScriptDefines/PlayerScript.cpp
 +++ b/src/server/game/Scripting/ScriptDefines/PlayerScript.cpp
-@@ -1138,6 +1138,16 @@ void ScriptMgr::OnPlayerMasterLootItem(Player* player, Item* item, uint32 count,
-     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_MASTER_LOOT_ITEM, script->OnPlayerMasterLootItem(player, item, count, lootguid));
+@@ -840,6 +840,16 @@ bool ScriptMgr::OnPlayerCanEnterMap(Player* player, MapEntry const* entry, Insta
+     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_ENTER_MAP, !script->OnPlayerCanEnterMap(player, entry, instance, mapDiff, loginCheck));
  }
  
 +void ScriptMgr::OnPlayerInstancePlayerLimit(Player* player, InstanceMap const* map, uint32& maxPlayers)
@@ -133,33 +133,34 @@ index 0a54bdd6..7ce170b0 100644
 +    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BATTLEGROUND_JOIN_AS_GROUP, script->OnPlayerBattlegroundJoinAsGroup(player, bgTypeId, joinAsGroup));
 +}
 +
- std::optional<uint32> ScriptMgr::OnPlayerGetGameModeMask(Player const* player)
+ bool ScriptMgr::OnPlayerCanInitTrade(Player* player, Player* target)
  {
-     uint32 mask = 0;
+     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_INIT_TRADE, !script->OnPlayerCanInitTrade(player, target));
 diff --git a/src/server/game/Scripting/ScriptDefines/PlayerScript.h b/src/server/game/Scripting/ScriptDefines/PlayerScript.h
-index 09cf6f66..c55ba3f1 100644
+index 6e36bd86..dcefa134 100644
 --- a/src/server/game/Scripting/ScriptDefines/PlayerScript.h
 +++ b/src/server/game/Scripting/ScriptDefines/PlayerScript.h
-@@ -27,6 +27,7 @@
- #include "AchievementMgr.h"
- #include "KillRewarder.h"
- 
-+class InstanceMap;
- class Object;
+@@ -31,6 +31,8 @@ class Object;
  class Pet;
  struct Mail;
-@@ -258,6 +259,8 @@ enum PlayerHook
-     PLAYERHOOK_ON_COA_PRESTIGE,
-     PLAYERHOOK_ON_COA_PRESTIGE_SAVED,
-     PLAYERHOOK_ON_MASTER_LOOT_ITEM,
+ 
++class InstanceMap;
++
+ enum PlayerHook
+ {
+     PLAYERHOOK_ON_PLAYER_JUST_DIED,
+@@ -188,6 +190,8 @@ enum PlayerHook
+     PLAYERHOOK_NOT_SET_ARENA_TEAM_INFO_FIELD,
+     PLAYERHOOK_CAN_JOIN_LFG,
+     PLAYERHOOK_CAN_ENTER_MAP,
 +    PLAYERHOOK_ON_INSTANCE_PLAYER_LIMIT,
 +    PLAYERHOOK_ON_BATTLEGROUND_JOIN_AS_GROUP,
-     PLAYERHOOK_END
- };
+     PLAYERHOOK_CAN_INIT_TRADE,
+     PLAYERHOOK_CAN_SET_TRADE_ITEM,
+     PLAYERHOOK_ON_SET_SERVER_SIDE_VISIBILITY,
+@@ -736,6 +740,24 @@ public:
  
-@@ -1122,6 +1125,24 @@ public:
-      */
-     virtual void OnPlayerMasterLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
+     [[nodiscard]] virtual bool OnPlayerCanEnterMap(Player* /*player*/, MapEntry const* /*entry*/, InstanceTemplate const* /*instance*/, MapDifficulty const* /*mapDiff*/, bool /*loginCheck*/) { return true; }
  
 +    /**
 +     * @brief This hook is called when a player tries to enter an instance, to resolve its player cap.
@@ -179,27 +180,27 @@ index 09cf6f66..c55ba3f1 100644
 +     */
 +    virtual void OnPlayerBattlegroundJoinAsGroup(Player* /*player*/, BattlegroundTypeId /*bgTypeId*/, uint8& /*joinAsGroup*/) { }
 +
+     [[nodiscard]] virtual bool OnPlayerCanInitTrade(Player* /*player*/, Player* /*target*/) { return true; }
+ 
      /**
-      * @brief This hook is called to resolve a character's Conquest of Azeroth game mode mask.
-      *
 diff --git a/src/server/game/Scripting/ScriptMgr.h b/src/server/game/Scripting/ScriptMgr.h
-index 938c9ba3..b0dd24f6 100644
+index 9bda98a8..ae5775ac 100644
 --- a/src/server/game/Scripting/ScriptMgr.h
 +++ b/src/server/game/Scripting/ScriptMgr.h
-@@ -529,6 +529,8 @@ public: /* PlayerScript */
-     void OnPlayerCoAPrestige(Player* player, CharacterDatabaseTransaction trans);
-     void OnPlayerCoAPrestigeSaved(Player* player);
-     void OnPlayerMasterLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
+@@ -482,6 +482,8 @@ public: /* PlayerScript */
+     bool OnPlayerNotSetArenaTeamInfoField(Player* player, uint8 slot, ArenaTeamInfoType type, uint32 value);
+     bool OnPlayerCanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, std::string const& comment);
+     bool OnPlayerCanEnterMap(Player* player, MapEntry const* entry, InstanceTemplate const* instance, MapDifficulty const* mapDiff, bool loginCheck);
 +    void OnPlayerInstancePlayerLimit(Player* player, InstanceMap const* map, uint32& maxPlayers);
 +    void OnPlayerBattlegroundJoinAsGroup(Player* player, BattlegroundTypeId bgTypeId, uint8& joinAsGroup);
-     std::optional<uint32> OnPlayerGetGameModeMask(Player const* player);
- 
-     // Anti cheat
-@@ -575,6 +577,7 @@ public: /* GroupScript */
+     bool OnPlayerCanInitTrade(Player* player, Player* target);
+     bool OnPlayerCanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot);
+     void OnPlayerSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
+@@ -574,6 +576,7 @@ public: /* GroupScript */
+     void OnGroupChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid);
+     void OnGroupDisband(Group* group);
      bool CanGroupJoinBattlegroundQueue(Group const* group, Player* member, Battleground const* bgTemplate, uint32 MinPlayerCount, bool isRated, uint32 arenaSlot);
++    void OnGroupBattlegroundMaxGroupSize(Group const* group, Battleground const* bgTemplate, uint32& maxGroupSize);
      void OnCreate(Group* group, Player* leader);
      void OnGroupLootRollStart(Group* group, Roll const& roll, Loot const& loot, LootItem const& item);
-+    void OnGroupBattlegroundMaxGroupSize(Group const* group, Battleground const* bgTemplate, uint32& maxGroupSize);
  
- public: /* GlobalScript */
-     void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
