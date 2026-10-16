@@ -21,7 +21,7 @@ the history, the decisions behind the code and the open threads.
 | [Brytenwally/mod-10-man-world](https://github.com/Brytenwally/mod-10-man-world) (`master`) | This module. Folder must be `modules/mod-10-man-world`. |
 | [Brytenwally/azerothcore-wotlk-coa](https://github.com/Brytenwally/azerothcore-wotlk-coa) (`main`) | The owner's core fork (Conquest of Azeroth, CoA). Updated from upstream from time to time; last checked at `dbb02f53`. |
 | [jealous-sound/azerothcore-wotlk-coa](https://github.com/jealous-sound/azerothcore-wotlk-coa) | Upstream of the fork. Public; its issues can be read via the web pages, not the GitHub API (not attached). |
-| [jealous-sound/mod-playerbots](https://github.com/jealous-sound/mod-playerbots) (branch `coa`) | Playerbots for CoA, used by the owner. Its folder must be `modules/mod-playerbots` (loader `Addmod_playerbotsScripts`). |
+| [Brytenwally/mod-playerbots](https://github.com/Brytenwally/mod-playerbots) (branch `coa`) | The owner's fork of jealous-sound's CoA playerbots, which they use. Its folder must be `modules/mod-playerbots` (loader `Addmod_playerbotsScripts`). The owner accepts direct commits to `coa` here too. |
 
 The core's never-commit rule: core changes live only in `patches/mod-10-man-world-core.patch`. Commits to the core
 repo's `claude/...` branch are not wanted.
@@ -88,6 +88,10 @@ When the owner says the patch fails after an upstream update: fetch `main`, try 
   come from the client's `Ascension_NamePlates` addon. Separately, quest 17011's kill counts (10/8/12) do not match
   its text (8/12/10); left unchanged because the data came from Ascension's client cache. Waiting on an in-game
   comparison by the owner.
+- **Altbot talents (mod-playerbots fork, commit `7dc030f`):** altbots now spend free talent points on level-up and
+  login (`AiPlayerbot.AutoPickTalentsAltBots`, default 1) via `SpendCoaTalentPoints` (add-only, under `RefusalFor`'s
+  rules; random bots keep `ApplyCoaTalents`, which lowers off-build entries). Compiled, not yet tested in game.
+- An LLM chat module for altbots (mod-ollama-chat) was considered and shelved: too slow on the owner's PCs.
 - Ideas the owner may come back to: a GitHub Actions Windows build that uploads binaries; level-scaled boss loot
   (left to the core developers).
 
