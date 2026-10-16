@@ -92,6 +92,9 @@ When the owner says the patch fails after an upstream update: fetch `main`, try 
 - **Altbot talents (mod-playerbots fork, commit `7dc030f`):** altbots now spend free talent points on level-up and
   login (`AiPlayerbot.AutoPickTalentsAltBots`, default 1) via `SpendCoaTalentPoints` (add-only, under `RefusalFor`'s
   rules; random bots keep `ApplyCoaTalents`, which lowers off-build entries). Compiled, not yet tested in game.
+- **Molten Core bot strategy (mod-playerbots `48346b1`):** bots now avoid Shazzrah's Reflections (tank drags him
+  clear) and kill Majordomo's Sacrificial Chains. Not yet adapted: Ragnaros' Son of Flame merges (adds within 5 yd
+  merge). Compiled, not tested in game.
 - An LLM chat module for altbots (mod-ollama-chat) was considered and shelved: too slow on the owner's PCs.
 - Ideas the owner may come back to: a GitHub Actions Windows build that uploads binaries; level-scaled boss loot
   (left to the core developers).
