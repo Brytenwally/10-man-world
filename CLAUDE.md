@@ -3,7 +3,8 @@
 10 Man World is an AzerothCore module for
 [Brytenwally/azerothcore-wotlk-coa](https://github.com/Brytenwally/azerothcore-wotlk-coa).
 User documentation is in `.github/README.md`.
-Read `docs/HANDOFF.md` at the start of a session: it holds the history, decisions and open threads of the work so far.
+The owner keeps the session handoff notes (history, decisions, open threads) on their own device, not in this repo.
+Ask them to paste the notes when that history is needed, and never commit them here.
 
 ## Git workflow
 
