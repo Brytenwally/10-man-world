@@ -22,6 +22,7 @@ the history, the decisions behind the code and the open threads.
 | [Brytenwally/azerothcore-wotlk-coa](https://github.com/Brytenwally/azerothcore-wotlk-coa) (`main`) | The owner's core fork (Conquest of Azeroth, CoA). Updated from upstream from time to time; last checked at `dbb02f53`. |
 | [jealous-sound/azerothcore-wotlk-coa](https://github.com/jealous-sound/azerothcore-wotlk-coa) | Upstream of the fork. Public; its issues can be read via the web pages, not the GitHub API (not attached). |
 | [Brytenwally/mod-playerbots](https://github.com/Brytenwally/mod-playerbots) (branch `coa`) | The owner's fork of jealous-sound's CoA playerbots, which they use. Its folder must be `modules/mod-playerbots` (loader `Addmod_playerbotsScripts`). The owner accepts direct commits to `coa` here too. |
+| [Brytenwally/mod-ale](https://github.com/Brytenwally/mod-ale) (`master`) | The owner's ALE (Lua engine) fork, made to build against the CoA core in `7943456` (DealDamage signature, non-copyable PlayerMenu, no target-changed hook, no travel stats). Folder `modules/mod-ale`. Direct commits to `master`. |
 
 The core's never-commit rule: core changes live only in `patches/mod-10-man-world-core.patch`. Commits to the core
 repo's `claude/...` branch are not wanted.
