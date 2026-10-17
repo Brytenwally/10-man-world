@@ -20,6 +20,8 @@ Ask them to paste the notes when that history is needed, and never commit them h
 - Before pushing to a fork branch, check whether it is the head of an open pull request (for example
   `Brytenwally/mod-playerbots` `coa` feeds an upstream PR). If it is, push new work to a separate branch of the fork
   instead, so it does not join that pull request.
+- New mod-playerbots work goes on `Brytenwally/mod-playerbots` branch `coa-bot-strategies` (bot strategies for CoA
+  content), never on `coa`.
 
 ## Module layout
 
