@@ -13,6 +13,14 @@ Ask them to paste the notes when that history is needed, and never commit them h
   that breaks.
 - Keep each commit focused, with a clear message.
 
+## The owner's other forks
+
+- Push only to the owner's own forks (`Brytenwally/*`). Never open a pull request against an upstream or original
+  repository; the owner opens upstream pull requests themselves once a change works.
+- Before pushing to a fork branch, check whether it is the head of an open pull request (for example
+  `Brytenwally/mod-playerbots` `coa` feeds an upstream PR). If it is, push new work to a separate branch of the fork
+  instead, so it does not join that pull request.
+
 ## Module layout
 
 - `src/`: module sources. `TenManWorldLoader.cpp` defines `Addmod_10_man_worldScripts()`, which AzerothCore derives
